@@ -1,0 +1,354 @@
+{
+  "info": {
+    "_postman_id": "9b128527-df21-4f81-a64f-4d9f7a5ecfa1",
+    "name": "Equipment Rental Management System API",
+    "description": "Comprehensive Postman API collection for Sports Equipment Rental Management System.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:5000/api",
+      "type": "string"
+    },
+    {
+      "key": "token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "equipmentId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "rentalId",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Register User (Member)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Sarah Connor\",\n  \"email\": \"sarah@example.com\",\n  \"password\": \"SecretPass123!\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/register",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "register"]
+            }
+          }
+        },
+        {
+          "name": "Login (Admin)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "if (jsonData.token) {",
+                  "    pm.collectionVariables.set('token', jsonData.token);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@sportsrental.com\",\n  \"password\": \"AdminPassword123!\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "login"]
+            }
+          }
+        },
+        {
+          "name": "Login (Member)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "if (jsonData.token) {",
+                  "    pm.collectionVariables.set('token', jsonData.token);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"john@example.com\",\n  \"password\": \"MemberPassword123!\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "login"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Equipment",
+      "item": [
+        {
+          "name": "Get All Equipment (With Filters)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/equipment?category=Cycling&available=true&search=Marlin",
+              "host": ["{{baseUrl}}"],
+              "path": ["equipment"],
+              "query": [
+                {
+                  "key": "category",
+                  "value": "Cycling"
+                },
+                {
+                  "key": "available",
+                  "value": "true"
+                },
+                {
+                  "key": "search",
+                  "value": "Marlin"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Equipment By ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/equipment/{{equipmentId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["equipment", "{{equipmentId}}"]
+            }
+          }
+        },
+        {
+          "name": "Create Equipment (Admin Only)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Cannondale Trail 5 Mountain Bike\",\n  \"category\": \"Cycling\",\n  \"description\": \"Hydraulic disc brakes with lightweight aluminum frame and SR Suntour fork.\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/equipment",
+              "host": ["{{baseUrl}}"],
+              "path": ["equipment"]
+            }
+          }
+        },
+        {
+          "name": "Update Equipment (Admin Only)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Cannondale Trail 5 Pro\",\n  \"available\": true\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/equipment/{{equipmentId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["equipment", "{{equipmentId}}"]
+            }
+          }
+        },
+        {
+          "name": "Delete Equipment (Admin Only - Blocks if Active Rental)",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/equipment/{{equipmentId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["equipment", "{{equipmentId}}"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Rentals",
+      "item": [
+        {
+          "name": "Create Rental (Atomic Lock)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"equipmentId\": \"{{equipmentId}}\",\n  \"days\": 5\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/rentals",
+              "host": ["{{baseUrl}}"],
+              "path": ["rentals"]
+            }
+          }
+        },
+        {
+          "name": "Get Rentals (Member: Own / Admin: All)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/rentals",
+              "host": ["{{baseUrl}}"],
+              "path": ["rentals"]
+            }
+          }
+        },
+        {
+          "name": "Get Overdue Rentals (Admin Only)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/rentals?overdue=true",
+              "host": ["{{baseUrl}}"],
+              "path": ["rentals"],
+              "query": [
+                {
+                  "key": "overdue",
+                  "value": "true"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Single Rental By ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/rentals/{{rentalId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["rentals", "{{rentalId}}"]
+            }
+          }
+        },
+        {
+          "name": "Mark Rental Returned (Admin Only)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/rentals/{{rentalId}}/return",
+              "host": ["{{baseUrl}}"],
+              "path": ["rentals", "{{rentalId}}", "return"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Health Check",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/health",
+          "host": ["{{baseUrl}}"],
+          "path": ["health"]
+        }
+      }
+    }
+  ]
+}
